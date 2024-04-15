@@ -1,15 +1,14 @@
 [tool.poetry]
-name = "airpyano"
+name = "airpyano-core"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Matteo Angeloni <mattange@gmail.com>"]
 readme = "README.md"
 packages = [{include = "airpyano", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 gpiozero = "^2.0.1"
-
 
 [build-system]
 requires = ["poetry-core"]
