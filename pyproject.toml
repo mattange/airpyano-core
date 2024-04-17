@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "airpyano-core"
 version = "0.1.0"
-description = ""
+description = "Core package for AirPyano"
 authors = ["Matteo Angeloni <mattange@gmail.com>"]
 readme = "README.md"
 packages = [{include = "airpyano", from = "src"}]
