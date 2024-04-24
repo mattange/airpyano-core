@@ -11,6 +11,18 @@ python = "^3.11"
 gpiozero = "^2.0.1"
 pygame = "^2.5.2"
 
+[tool.poetry.group.tests.dependencies]
+pytest = "^8.1.1"
+
+[tool.poetry.scripts]
+list_sounds = "airpyano.scripts.list_sounds:main"
+pyano = "airpyano.scripts.pyano:main" 
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]

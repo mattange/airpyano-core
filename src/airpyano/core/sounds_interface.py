@@ -1,7 +1,7 @@
-from pahtlib import Path
+from pathlib import Path
 from glob import iglob
 
-from pygame.mixer import Sound
+from pygame import mixer
 
 class SoundsIterface():
 
@@ -16,10 +16,15 @@ class SoundsIterface():
         return len(self.files)
 
     def __getitem__(self, key):
-        return self._dict[key]
+        if self._is_initialised:
+            return self._sounds[key]
+        else:
+            raise RuntimeError("The interface was not initialised before retrieving a Sound object.")
     
-    def initialize(self):
-        self._sounds = {i: Sound(f) for i, f in enumerate(self.files)}
+    def initialise(self, mixer: mixer):
+        if mixer.get_init() is None:
+            mixer.init()
+        self._sounds = {i: mixer.Sound(self.root_dir / f) for i, f in enumerate(self.files)}
         self._is_initialised = True
     
     @property
@@ -28,7 +33,7 @@ class SoundsIterface():
     @volume.setter
     def volume(self, value: float):
         if self._is_initialised:
-            for sound in self._sounds.items():
+            for sound in self._sounds.values():
                 sound.set_volume(value)
         else:
             raise RuntimeError("The interface was not initialised before volume was set.")
