@@ -53,6 +53,11 @@ def main():
                            required=False,
                            default=10,
                            help="The minimum start distance from the sensor to use for the airpyano, in cm. Defaults to 10.")
+    argparser.add_argument("--channels",
+                           type=int,
+                           required=False,
+                           default=8,
+                           help="The number of mixer channels to use for the airpyano. Defaults to 8.")
     
     args = argparser.parse_args()
 
@@ -79,7 +84,9 @@ def main():
     
     pyano_key_width = (max_distance - min_distance) / len(sounds)
 
+    channels = args.channels
     mixer.init()
+    mixer.set_num_channels(channels)
     sounds.initialise(mixer)
 
     print(f'this sounds package has {len(sounds)} sounds')
@@ -87,5 +94,6 @@ def main():
     print('ready to play')
     import time
     for i in range(len(sounds)):
+        print(i)
         sounds[i].play()
-        time.sleep(0.3)
+        time.sleep(0.5)
