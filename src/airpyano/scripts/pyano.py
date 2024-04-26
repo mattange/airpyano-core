@@ -1,17 +1,21 @@
 import pkgutil
 import importlib
+import math
 from argparse import ArgumentParser, ArgumentTypeError
 
+from gpiozero import DistanceSensor
 from pygame import mixer
 
 from .. import sounds as snd
 from ..core.sounds_interface import SoundsIterface
 
-MIN_LENGTH = 50 # used this as random meaningful number
-MAX_LENGTH = 390 # should not be superior to MAX_DISTANCE - MIN_DISTANCE
-
 MIN_DISTANCE = 10 # should not be inferior to the minimum distance of the sensor
+MIN_DISTANCE_IN_M = MIN_DISTANCE / 100
 MAX_DISTANCE = 400 # max distance of the sensor
+MAX_DISTANCE_IN_M = MAX_DISTANCE/100
+
+MIN_LENGTH = 50 # used this as random meaningful number
+MAX_LENGTH = MAX_DISTANCE - MIN_DISTANCE
 
 def pyano_length(arg):
     try:
@@ -58,7 +62,20 @@ def main():
                            required=False,
                            default=8,
                            help="The number of mixer channels to use for the airpyano. Defaults to 8.")
+    # For GPIO PIN numbering and connections see
+    # https://www.raspberrypi.com/documentation/computers/raspberry-pi.html
+    argparser.add_argument("--echo",
+                           type=int,
+                           required=False,
+                           default=17,
+                           help="The GPIO for the echo connection to the distance sensor. Defaults to 17 (pin #11).")
+    argparser.add_argument("--trigger",
+                           type=int,
+                           required=False,
+                           default=4,
+                           help="The GPIO for the trigger connection to the distance sensor. Defaults to 4 (pin #7).")
     
+
     args = argparser.parse_args()
 
     length = args.length
@@ -82,18 +99,41 @@ def main():
     if not isinstance(sounds, SoundsIterface):
         raise RuntimeError(f'Interface {sounds_interface_name} is not of type SoundsInterface')
     
-    pyano_key_width = (max_distance - min_distance) / len(sounds)
+    normalised_pyano_key_width = 1 / len(sounds)
 
     channels = args.channels
     mixer.init()
     mixer.set_num_channels(channels)
     sounds.initialise(mixer)
 
-    print(f'this sounds package has {len(sounds)} sounds')
-    print(f'the width of each key is {pyano_key_width}')
-    print('ready to play')
-    import time
-    for i in range(len(sounds)):
-        print(i)
-        sounds[i].play()
-        time.sleep(0.5)
+    echo = args.echo
+    trigger = args.trigger
+    sensor = DistanceSensor(echo=echo, trigger=trigger,
+                            max_distance=max_distance, 
+                            threshold_distance=min_distance)
+
+    try:
+        import time
+        while True:
+            dcm = sensor.distance * 100
+            if dcm < min_distance or dcm > max_distance:
+                continue
+            norm_distance = (dcm - min_distance) / (max_distance - min_distance)
+            idx = math.floor(norm_distance / normalised_pyano_key_width)
+            
+            # check on how many tracks sound is already playing
+            # if more than 1, wait a predefined number of seconds?
+            print(idx)
+            time.sleep(1.)
+
+    except KeyboardInterrupt:
+        pass
+
+    # print(f'this sounds package has {len(sounds)} sounds')
+    # print(f'the width of each key is {pyano_key_width}')
+    # print('ready to play')
+    # import time
+    # for i in range(len(sounds)):
+    #     print(i)
+    #     sounds[i].play()
+    #     time.sleep(0.5)
