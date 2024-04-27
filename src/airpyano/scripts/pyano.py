@@ -4,6 +4,7 @@ import math
 from argparse import ArgumentParser, ArgumentTypeError
 
 from gpiozero import DistanceSensor
+from gpiozero.pins.pigpio import PiGPIOFactory
 from pygame import mixer
 
 from .. import sounds as snd
@@ -113,24 +114,31 @@ def main():
 
     echo = args.echo
     trigger = args.trigger
+    DistanceSensor.pin_factory = PiGPIOFactory()
     sensor = DistanceSensor(echo=echo, trigger=trigger,
                             max_distance=max_distance, 
                             threshold_distance=min_distance)
 
     try:
         import time
+        idx_old = -1
         while True:
             dcm = sensor.distance * 100
             if dcm < min_distance or dcm > max_distance:
+                idx_old = -1
                 continue
-            print(f"Precise distance measured in cm: {dcm}")
+            #print(f"Precise distance measured in cm: {dcm}")
             norm_distance = (dcm - min_distance) / (max_distance - min_distance)
             idx = math.floor(norm_distance / normalised_pyano_key_width)
-            
+            sound_to_play = sounds[idx]
+            if idx == idx_old and sound_to_play.get_num_channels() > 0:
+                time.sleep(0.5)
+                continue
             # check on how many tracks sound is already playing
             # if more than 1, wait a predefined number of seconds?
             print(f"Pyano key index: {idx}")
-            time.sleep(1.)
+            sound_to_play.play()
+            idx_old = idx
 
     except KeyboardInterrupt:
         pass

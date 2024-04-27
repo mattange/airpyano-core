@@ -10,6 +10,8 @@ packages = [{include = "airpyano", from = "src"}]
 python = "^3.11"
 gpiozero = "^2.0.1"
 pygame = "^2.5.2"
+rpi-gpio = "^0.7.1"
+lgpio = "^0.2.2.0"
 pigpio = "^1.78"
 
 [tool.poetry.group.tests.dependencies]
