@@ -101,6 +101,11 @@ def main():
     
     normalised_pyano_key_width = 1 / len(sounds)
 
+    print(f"Number of available sounds {len(sounds)}")
+    print(f"Keyboard starting at cm from sensor: {start}")
+    print(f"Length of keyboard in cm: {length}")
+    print(f"Width of pyano key in cm: {length * normalised_pyano_key_width}")
+
     channels = args.channels
     mixer.init()
     mixer.set_num_channels(channels)
@@ -118,12 +123,13 @@ def main():
             dcm = sensor.distance * 100
             if dcm < min_distance or dcm > max_distance:
                 continue
+            print(f"Precise distance measured in cm: {dcm}")
             norm_distance = (dcm - min_distance) / (max_distance - min_distance)
             idx = math.floor(norm_distance / normalised_pyano_key_width)
             
             # check on how many tracks sound is already playing
             # if more than 1, wait a predefined number of seconds?
-            print(idx)
+            print(f"Pyano key index: {idx}")
             time.sleep(1.)
 
     except KeyboardInterrupt:
