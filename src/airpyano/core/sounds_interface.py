@@ -28,6 +28,13 @@ class SoundsIterface():
         self._is_initialised = True
     
     @property
+    def sound_lengths(self):
+        if self._is_initialised:
+            return [s.get_length() for s .in self._sounds.values()]
+        else:
+            raise RuntimeError("The interface was not initialised before getting sound legnths.")
+
+    @property
     def volume(self) -> float:
         return self._volume
     @volume.setter
