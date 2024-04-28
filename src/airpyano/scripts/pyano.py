@@ -120,7 +120,6 @@ def main():
                             threshold_distance=min_distance)
 
     try:
-        import time
         idx_old = -1
         while True:
             dcm = sensor.distance * 100
@@ -132,22 +131,10 @@ def main():
             idx = math.floor(norm_distance / normalised_pyano_key_width)
             sound_to_play = sounds[idx]
             if idx == idx_old and sound_to_play.get_num_channels() > 0:
-                time.sleep(0.5)
                 continue
-            # check on how many tracks sound is already playing
-            # if more than 1, wait a predefined number of seconds?
-            print(f"Pyano key index: {idx}")
             sound_to_play.play()
             idx_old = idx
 
     except KeyboardInterrupt:
         pass
-
-    # print(f'this sounds package has {len(sounds)} sounds')
-    # print(f'the width of each key is {pyano_key_width}')
-    # print('ready to play')
-    # import time
-    # for i in range(len(sounds)):
-    #     print(i)
-    #     sounds[i].play()
-    #     time.sleep(0.5)
+    
